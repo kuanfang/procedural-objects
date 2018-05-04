@@ -9,7 +9,7 @@ import os
 
 import numpy as np
 
-from lib import mesh_utils
+from utils import mesh_utils
 
 
 def parse_args():

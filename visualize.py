@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Load a body to the simulation.
+"""Visualize a URDF or OBJ file in the simulation.
 """
 
 import argparse
@@ -32,6 +32,22 @@ def parse_args():
 def main():
     args = parse_args()
 
+    _, file_extension = os.path.splitext(args.input_path)
+
+    if file_extension == '.obj':
+        with open('templates/simple.xml', 'r') as f:
+            template = f.read()
+
+        urdf_path = 'outputs/tmp.urdf'
+        filename = os.path.relpath(args.input_path, urdf_path)
+        filename = os.path.relpath(filename, '..')
+        urdf = template.format(filename=filename)
+
+        with open(urdf_path, 'w') as f:
+            f.write(urdf)
+            f.flush()
+    else:
+        urdf_path = args.input_path
 
     pybullet.connect(pybullet.GUI)
     pybullet.resetSimulation()
@@ -39,7 +55,7 @@ def main():
     pybullet.setTimeStep(1e-2)
 
     pybullet.loadURDF(
-            fileName=args.input_path,
+            fileName=urdf_path,
             basePosition=[0, 0, 0],
             baseOrientation=[0, 0, 0, 1],
             useFixedBase=True,
@@ -51,4 +67,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
