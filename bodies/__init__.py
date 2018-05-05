@@ -1,0 +1,1 @@
+from .hammer import HammerGenerator
