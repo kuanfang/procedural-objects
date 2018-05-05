@@ -1,91 +1,91 @@
 """Hammer generator.
 """
+
 import os
+import random
 
 import numpy as np
 
-from bodies.body import BodyGenerator
-from links.link import LinkGenerator
-from links.scad_link import ScadLinkGenerator
+from bodies.body import Body
+from links.link import Link
+from links.scad_link import ScadCubeLink
 from utils.transformations import matrix3_from_euler
 
 
-class HammerGenerator(BodyGenerator):
+LATERAL_FRICTION_RANGE = [0.2, 1.0]
+SPINNING_FRICTION_RANGE = [0.2, 1.0]
+INERTIA_FRICTION_RANGE = [0.2, 1.0]
 
-    HEAD_MASS_RANGE = [0.5, 1.0]
-    HEAD_SCALE_RANGE = [[0.1, 0.1], [0.1, 0.1], [1, 1]]
+HANDLE_CONFIG = {
+        'mass_range': [0.5, 1.0],
+        'size_range': [[0.1, 0.1], [0.1, 0.1], [1, 1]],
+        'lateral_friction_range': LATERAL_FRICTION_RANGE,
+        'spinning_friction_range': SPINNING_FRICTION_RANGE,
+        'inertia_friction_range': INERTIA_FRICTION_RANGE,
+        }
 
-    HANDLE_MASS_RANGE = [0.5, 1.0]
-    HANDLE_SCALE_RANGE = [[0.1, 0.1], [0.1, 0.1], [1, 1]]
+HEAD_CONFIG = {
+        'mass_range': [0.5, 1.0],
+        'size_range': [[0.1, 0.1], [0.1, 0.1], [1, 1]],
+        'lateral_friction_range': LATERAL_FRICTION_RANGE,
+        'spinning_friction_range': SPINNING_FRICTION_RANGE,
+        'inertia_friction_range': INERTIA_FRICTION_RANGE,
+        }
 
-    LATERAL_FRICTION_RANGE = [0.2, 1.0]
-    SPINNING_FRICTION_RANGE = [0.2, 1.0]
-    INERTIA_FRICTION_RANGE = [0.2, 1.0]
 
-    def __init__(self, mesh_paths=None, name='body.urdf'):
+def transform_point(point, rotation, translation):
+    """Rigid transformation of a point.
+
+    Args:
+        point: A 3-dimensional vector.
+        rotation: The rotation in Euler angles.
+        translation: The translation as a 3-dimensional vector.
+
+    Returns:
+        The transformed point as a 3-dimensional vector.
+    """
+    roll = rotation[0]
+    pitch = rotation[1]
+    yaw = rotation[2]
+    rotation_matrix = matrix3_from_euler(roll, pitch, yaw)
+
+    return rotation_matrix.dot(point) + np.array(translation)
+
+
+class Hammer(Body):
+
+    def __init__(self, obj_paths=None, random_flip=True, name='body'):
         """Initialize.
         """
         with open('templates/hammer.xml', 'r') as f:
             self.template = f.read()
 
-        if mesh_paths is None:
-            self.handle_generator = ScadLinkGenerator(
-                     name='handle',
-                     mass_range=self.HANDLE_MASS_RANGE,
-                     lateral_friction_range=self.LATERAL_FRICTION_RANGE,
-                     spinning_friction_range=self.SPINNING_FRICTION_RANGE,
-                     inertia_friction_range=self.INERTIA_FRICTION_RANGE,
-                     scale_range=self.HANDLE_SCALE_RANGE,
-                     )
+        if obj_paths is None:
+            self.handle_generators = [
+                    ScadCubeLink(name='handle', **HANDLE_CONFIG),
+                    ]
 
-            self.head_generator = ScadLinkGenerator(
-                     name='head',
-                     mass_range=self.HEAD_MASS_RANGE,
-                     lateral_friction_range=self.LATERAL_FRICTION_RANGE,
-                     spinning_friction_range=self.SPINNING_FRICTION_RANGE,
-                     inertia_friction_range=self.INERTIA_FRICTION_RANGE,
-                     scale_range=self.HEAD_SCALE_RANGE,
-                     )
+            self.head_generators = [
+                    ScadCubeLink(name='head', **HEAD_CONFIG),
+                    ]
         else:
-            self.handle_generator = LinkGenerator(
-                     name='handle',
-                     mass_range=self.HANDLE_MASS_RANGE,
-                     lateral_friction_range=self.LATERAL_FRICTION_RANGE,
-                     spinning_friction_range=self.SPINNING_FRICTION_RANGE,
-                     inertia_friction_range=self.INERTIA_FRICTION_RANGE,
-                     scale_range=self.HANDLE_SCALE_RANGE,
-                     mesh_paths=mesh_paths,
-                     )
+            self.handle_generators = [
+                    Link(
+                        name='handle',
+                        obj_paths=obj_paths,
+                        **HANDLE_CONFIG)
+                    ]
 
-            self.head_generator = LinkGenerator(
-                     name='head',
-                     mass_range=self.HEAD_MASS_RANGE,
-                     lateral_friction_range=self.LATERAL_FRICTION_RANGE,
-                     spinning_friction_range=self.SPINNING_FRICTION_RANGE,
-                     inertia_friction_range=self.INERTIA_FRICTION_RANGE,
-                     scale_range=self.HEAD_SCALE_RANGE,
-                     mesh_paths=mesh_paths,
-                     )
+            self.head_generators = [
+                    Link(
+                        name='head',
+                        obj_paths=obj_paths,
+                        **HEAD_CONFIG)
+                    ]
+
+        self.random_flip = random_flip
 
         self.name = name
-
-    def sample_head_transformation(self, handle_data, head_data):
-        """
-        """
-        rotation = [np.pi/2, 0., 0.]
-        transition = [0., 0., 0.5]
-
-        return rotation, transition
-
-    def transform_point(self, point, rotation, transition):
-        """
-        """
-        roll = rotation[0]
-        pitch = rotation[1]
-        yaw = rotation[2]
-        rotation_matrix = matrix3_from_euler(roll, pitch, yaw)
-
-        return rotation_matrix.dot(point) + np.array(transition)
 
     def generate(self, path):
         """Generate a body.
@@ -93,15 +93,18 @@ class HammerGenerator(BodyGenerator):
         Args:
             path: The folder to save the URDF and OBJ files.
         """
+        handle_generator = random.choice(self.handle_generators)
+        head_generator = random.choice(self.head_generators)
+
         # Generate links.
-        handle_data = self.handle_generator.generate(path)
-        head_data = self.head_generator.generate(path)
+        handle_data = handle_generator.generate(path)
+        head_data = head_generator.generate(path)
 
         # Modify links' positions and orientations.
         rotation, transition = self.sample_head_transformation(
                 handle_data, head_data)
         center = [head_data['x'], head_data['y'], head_data['z']]
-        center = self.transform_point(center, rotation, transition)
+        center = transform_point(center, rotation, transition)
         head_data['x'] = center[0]
         head_data['y'] = center[1]
         head_data['z'] = center[2]
@@ -110,10 +113,12 @@ class HammerGenerator(BodyGenerator):
         head_data['yaw'] = rotation[2]
 
         # TODO(kuanfang): Random flipping.
+        if self.random_flip:
+            pass
 
         # Genearte the URDF files.
-        handle_urdf = self.handle_generator.convert_data_to_urdf(handle_data)
-        head_urdf = self.head_generator.convert_data_to_urdf(head_data)
+        handle_urdf = handle_generator.convert_data_to_urdf(handle_data)
+        head_urdf = head_generator.convert_data_to_urdf(head_data)
         urdf = self.template.format(
                 name=self.name,
                 handle_link=handle_urdf,
@@ -123,6 +128,23 @@ class HammerGenerator(BodyGenerator):
                 )
 
         # Write URDF to file.
-        urdf_filename = os.path.join(path, 'body.urdf')
+        urdf_filename = os.path.join(path, '%s.urdf' % (self.name))
         with open(urdf_filename, 'w') as f:
             f.write(urdf)
+
+    def sample_head_transformation(self, handle_data, head_data):
+        """Sample the transformation for the head pose.
+
+        Args:
+            handle_data: The data dictionary of the handle.
+            head_data: The data dictionary of the head.
+
+        Returns:
+            rotation: The rotation as Euler angles.
+            translation: The translation vector.
+        """
+        # The orthogonal T-Shape hammer.
+        rotation = [0.5 * np.pi, 0, 0]
+        translation = [0, 0, 0.5 * handle_data['size_z']]
+
+        return rotation, translation

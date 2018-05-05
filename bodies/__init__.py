@@ -1,1 +1,1 @@
-from .hammer import HammerGenerator
+from .hammer import Hammer

@@ -1,11 +1,16 @@
 """Link generator.
 """
+import abc
 import os
 
 import numpy as np
 
 
-class LinkGenerator(object):
+class Link(object):
+    """Link generator.
+    """
+
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self,
                  name,
@@ -13,8 +18,8 @@ class LinkGenerator(object):
                  lateral_friction_range,
                  spinning_friction_range,
                  inertia_friction_range,
-                 scale_range,
-                 mesh_paths,
+                 size_range,
+                 obj_paths,
                  ):
         """Initialize.
         """
@@ -26,8 +31,8 @@ class LinkGenerator(object):
         self.lateral_friction_range = lateral_friction_range
         self.spinning_friction_range = spinning_friction_range
         self.inertia_friction_range = inertia_friction_range
-        self.scale_range = scale_range
-        self.mesh_paths = mesh_paths
+        self.size_range = size_range
+        self.obj_paths = obj_paths
 
     def generate(self, path=None):
         """Generate a link.
@@ -62,14 +67,17 @@ class LinkGenerator(object):
         data['roll'] = 0
         data['pitch'] = 0
         data['yaw'] = 0
-        data['scale_x'] = np.random.uniform(*self.scale_range[0])
-        data['scale_y'] = np.random.uniform(*self.scale_range[1])
-        data['scale_z'] = np.random.uniform(*self.scale_range[2])
+        data['size_x'] = np.random.uniform(*self.size_range[0])
+        data['size_y'] = np.random.uniform(*self.size_range[1])
+        data['size_z'] = np.random.uniform(*self.size_range[2])
+        data['scale_x'] = data['size_x']
+        data['scale_y'] = data['size_y']
+        data['scale_z'] = data['size_z']
 
-        # Choose mesh.
-        mesh_file = np.random.choice(self.mesh_paths)
+        # Choose and copy mesh.
+        obj_file = np.random.choice(self.obj_paths)
         data['filename'] = os.path.join(path, '%s.obj' % (self.name))
-        command = 'cp {:s} {:s}'.format(mesh_file, data['filename'])
+        command = 'cp {:s} {:s}'.format(obj_file, data['filename'])
         os.system(command)
 
         return data

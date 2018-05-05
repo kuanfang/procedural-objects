@@ -1,15 +1,25 @@
 """Body generator.
 """
 
+import abc
 
-class BodyGenerator(object):
 
-    def __init__(self, name='body.urdf'):
+class Body(object):
+    """Body generator.
+    """
+
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, obj_paths=None, name='body.urdf'):
         """
         """
         pass
 
-    def generate_urdf(self, path=None):
-        """
+    @abc.abstractmethod
+    def generate(self, path):
+        """Generate a body.
+
+        Args:
+            path: The folder to save the URDF and OBJ files.
         """
         pass

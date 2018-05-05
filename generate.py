@@ -24,8 +24,8 @@ def parse_args():
                         type=str,
                         required=True)
 
-    parser.add_argument('--mesh',
-                        dest='mesh',
+    parser.add_argument('--obj',
+                        dest='obj_paths',
                         help='Path to the mesh files.',
                         default=None,
                         type=str)
@@ -54,16 +54,22 @@ def main():
         os.makedirs(args.output_dir)
 
     if args.body_type == 'hammer':
-        body_generator_class = bodies.HammerGenerator
+        body_class = bodies.Hammer
+    elif args.body_type == 't':
+        body_class = bodies.TShape
+    # elif args.body_type == 'x':
+    #     body_class = bodies.TShape
+    # elif args.body_type == 'l':
+    #     body_class = bodies.LShape
     else:
         raise ValueError
 
-    if args.mesh is None:
-        mesh_paths = None
+    if args.obj_paths is None:
+        obj_paths = None
     else:
-        mesh_paths = glob.glob(args.mesh)
+        obj_paths = glob.glob(args.obj_paths)
 
-    body_generator = body_generator_class(mesh_paths=mesh_paths)
+    body_generator = body_class(obj_paths=obj_paths)
 
     for body_id in range(args.num_bodies):
         output_path = os.path.join(args.output_dir, '%06d' % (body_id))

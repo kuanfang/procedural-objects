@@ -1,14 +1,19 @@
-"""Link generator.
+"""Link generator through OpenScad.
 """
+import abc
 import os
 from sys import platform
 
 import numpy as np
 
-from links.link import LinkGenerator
+from links.link import Link
 
 
-class ScadLinkGenerator(LinkGenerator):
+class ScadLink(Link):
+    """Generate link with OpenScad.
+
+    http://www.openscad.org/cheatsheet/index.html
+    """
 
     def __init__(self,
                  name,
@@ -16,7 +21,7 @@ class ScadLinkGenerator(LinkGenerator):
                  lateral_friction_range,
                  spinning_friction_range,
                  inertia_friction_range,
-                 scale_range,
+                 size_range,
                  ):
         """Initialize.
         """
@@ -28,7 +33,7 @@ class ScadLinkGenerator(LinkGenerator):
         self.lateral_friction_range = lateral_friction_range
         self.spinning_friction_range = spinning_friction_range
         self.inertia_friction_range = inertia_friction_range
-        self.scale_range = scale_range
+        self.size_range = size_range
 
     def generate(self, path=None):
         """Generate a link.
@@ -63,29 +68,44 @@ class ScadLinkGenerator(LinkGenerator):
         data['roll'] = 0
         data['pitch'] = 0
         data['yaw'] = 0
-        data['scale_x'] = np.random.uniform(*self.scale_range[0])
-        data['scale_y'] = np.random.uniform(*self.scale_range[1])
-        data['scale_z'] = np.random.uniform(*self.scale_range[2])
+        data['size_x'] = np.random.uniform(*self.size_range[0])
+        data['size_y'] = np.random.uniform(*self.size_range[1])
+        data['size_z'] = np.random.uniform(*self.size_range[2])
+        data['scale_x'] = 1
+        data['scale_y'] = 1
+        data['scale_z'] = 1
 
         # Generate mesh use OpenScad.
-        data['scad_type'] = 'cube'  # TODO
         data['filename'] = self.run_openscad(path, data)
 
         return data
 
     def run_openscad(self, path, data):
         """Run OpenScad command.
+
+        Args:
+            path: The folder to save the URDF and OBJ files.
+            data: The data dictionary.
+
+        Returns:
+            obj_filename: The filename of the OBJ file.
         """
+        # Set filenames.
         scad_filename = os.path.join(path, '%s.scad' % (self.name))
         stl_filename = os.path.join(path, '%s.stl' % (self.name))
         obj_filename = os.path.join(path, '%s.obj' % (self.name))
         output_filename = os.path.join(path, '%s' % (self.name))
 
-        self.generate_scad(scad_filename, data)
+        # Run OpenScad.
+        scad = self.generate_scad(data)
+
+        with open(scad_filename, 'w') as f:
+            f.write(scad)
 
         command = 'openscad -o {:s} {:s}'.format(stl_filename, scad_filename)
         os.system(command)
 
+        # Convert the generated STL file to OBJ file.
         if platform == 'linux' or platform == 'linux2':
             meshconv_bin = './bin/meshconv_linux'
         elif platform == 'darwin':
@@ -99,23 +119,38 @@ class ScadLinkGenerator(LinkGenerator):
                 meshconv_bin, output_filename, stl_filename)
         os.system(command)
 
+        # Return.
         return obj_filename
 
-    def generate_scad(self, filename, data):
-        """
-        """
-        if data['scad_type'] == 'cube':
-            scad = 'cube([{:f}, {:f}, {:f}]);'.format(
-                    data['scale_x'],
-                    data['scale_y'],
-                    data['scale_z'])
-        # elif data['scad_type'] == 'cylinder':
-        #     'cylinder([{:f}, {:f}, {:f}]);'.format(
-        #             data['scale_z'],
-        #             data['scale_x'],
-        #             data['scale_y'])
-        else:
-            pass
+    @abc.abstractmethod
+    def generate_scad(self, data):
+        """Randomly generate the OpenScad description data.
 
-        with open(filename, 'w') as f:
-            f.write(scad)
+        Args:
+            data: The data dictionary.
+
+        Returns:
+            scad: The description data.
+        """
+        raise NotImplementedError
+
+
+class ScadCubeLink(ScadLink):
+    """Generate cuboids with OpenScad.
+
+    https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Primitive_Solids#cube
+    """
+
+    def generate_scad(self, data):
+        """Randomly generate the OpenScad description data.
+
+        Args:
+            data: The data dictionary.
+
+        Returns:
+            scad: The description data.
+        """
+        scad = 'cube([{x:f}, {y:f}, {z:f}], center=true);'.format(
+                x=data['size_x'], y=data['size_y'], z=data['size_z'])
+
+        return scad
