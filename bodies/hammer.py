@@ -191,15 +191,8 @@ class TShape(Hammer):
     def sample_head_transformation(self, handle_data, head_data):
         """Sample the transformation for the head pose.
 
-        Args:
-            handle_data: The data dictionary of the handle.
-            head_data: The data dictionary of the head.
-
-        Returns:
-            rotation: The rotation as Euler angles.
-            translation: The translation vector.
+        See the parent class.
         """
-        # The orthogonal T-Shape hammer.
         rotation = [
                 np.random.choice([-1, 1]) * np.random.uniform(
                     0, 0.15 * np.pi) + 0.5 * np.pi,
@@ -225,15 +218,8 @@ class LShape(Hammer):
     def sample_head_transformation(self, handle_data, head_data):
         """Sample the transformation for the head pose.
 
-        Args:
-            handle_data: The data dictionary of the handle.
-            head_data: The data dictionary of the head.
-
-        Returns:
-            rotation: The rotation as Euler angles.
-            translation: The translation vector.
+        See the parent class.
         """
-        # The orthogonal T-Shape hammer.
         rotation = [
                 0.5 * np.pi + np.random.choice([-1, 1]) * np.random.uniform(
                     0, 0.15 * np.pi),
@@ -259,15 +245,8 @@ class XShape(Hammer):
     def sample_head_transformation(self, handle_data, head_data):
         """Sample the transformation for the head pose.
 
-        Args:
-            handle_data: The data dictionary of the handle.
-            head_data: The data dictionary of the head.
-
-        Returns:
-            rotation: The rotation as Euler angles.
-            translation: The translation vector.
+        See the parent class.
         """
-        # The orthogonal T-Shape hammer.
         rotation = [
                 0.5 * np.pi + np.random.uniform(-0.15 * np.pi, 0.15 * np.pi),
                 np.random.uniform(-0.15 * np.pi, 0.15 * np.pi),
