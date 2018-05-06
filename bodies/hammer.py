@@ -9,6 +9,8 @@ import numpy as np
 from bodies.body import Body
 from links.link import Link
 from links.scad_link import ScadCubeLink
+from links.scad_link import ScadCylinderLink
+from links.scad_link import ScadPolygonLink
 from utils.transformations import matrix3_from_euler
 
 
@@ -18,7 +20,7 @@ INERTIA_FRICTION_RANGE = [0.2, 1.0]
 
 HANDLE_CONFIG = {
         'mass_range': [0.5, 1.0],
-        'size_range': [[0.1, 0.1], [0.1, 0.1], [1, 1]],
+        'size_range': [[0.1, 0.1], [0.2, 0.2], [1, 1]],
         'lateral_friction_range': LATERAL_FRICTION_RANGE,
         'spinning_friction_range': SPINNING_FRICTION_RANGE,
         'inertia_friction_range': INERTIA_FRICTION_RANGE,
@@ -26,7 +28,7 @@ HANDLE_CONFIG = {
 
 HEAD_CONFIG = {
         'mass_range': [0.5, 1.0],
-        'size_range': [[0.1, 0.1], [0.1, 0.1], [1, 1]],
+        'size_range': [[0.1, 0.1], [0.2, 0.2], [1, 1]],
         'lateral_friction_range': LATERAL_FRICTION_RANGE,
         'spinning_friction_range': SPINNING_FRICTION_RANGE,
         'inertia_friction_range': INERTIA_FRICTION_RANGE,
@@ -53,6 +55,10 @@ def transform_point(point, rotation, translation):
 
 
 class Hammer(Body):
+    """Hammer generator.
+
+    A hammer is defined as a two-part object composed of a handle and a head.
+    """
 
     def __init__(self, name, obj_paths=None, random_flip=True):
         """Initialize.
@@ -69,10 +75,14 @@ class Hammer(Body):
         if obj_paths is None:
             self.handle_generators = [
                     ScadCubeLink(name='handle', **HANDLE_CONFIG),
+                    ScadCylinderLink(name='handle', **HANDLE_CONFIG),
+                    ScadPolygonLink(name='handle', **HANDLE_CONFIG),
                     ]
 
             self.head_generators = [
                     ScadCubeLink(name='head', **HEAD_CONFIG),
+                    ScadCylinderLink(name='head', **HEAD_CONFIG),
+                    ScadPolygonLink(name='head', **HEAD_CONFIG),
                     ]
         else:
             self.handle_generators = [

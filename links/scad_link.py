@@ -9,6 +9,9 @@ import numpy as np
 from links.link import Link
 
 
+ROUND_PROB = 0.7
+
+
 class ScadLink(Link):
     """Generate link with OpenScad.
 
@@ -160,5 +163,85 @@ class ScadCubeLink(ScadLink):
         """
         scad = 'cube([{x:f}, {y:f}, {z:f}], center=true);'.format(
                 x=data['size_x'], y=data['size_y'], z=data['size_z'])
+
+        return scad
+
+
+class ScadCylinderLink(ScadLink):
+    """Generate cylinder with OpenScad.
+
+    https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Primitive_Solids#cylinder
+    """
+
+    def generate_scad(self, data):
+        """Randomly generate the OpenScad description data.
+
+        Args:
+            data: The data dictionary.
+
+        Returns:
+            scad: The description data.
+        """
+        fn = np.random.randint(20, 64)
+        scad = ('cylinder(h={h:f}, d1={d1:f}, d2={d2:f}, $fn={fn:d}, '
+                'center=true);').format(h=data['size_z'],
+                                        d1=data['size_x'],
+                                        d2=data['size_y'],
+                                        fn=fn)
+
+        if np.random.rand() < ROUND_PROB:
+            scad1 = 'sphere(d={d:f}, $fn={fn:d});'.format(
+                    d=data['size_x'], fn=fn)
+            scad1 = 'translate([0, 0, -%f]) {{%s}} ' % (
+                    0.5 * data['size_z'], scad1)
+            scad = scad + ' ' + scad1
+
+        if np.random.rand() < ROUND_PROB:
+            scad2 = 'sphere(d={d:f}, $fn={fn:d});'.format(
+                    d=data['size_y'], fn=fn)
+            scad2 = 'translate([0, 0, %f]) {{%s}} ' % (
+                    0.5 * data['size_z'], scad2)
+            scad = scad + ' ' + scad2
+
+        return scad
+
+
+class ScadPolygonLink(ScadLink):
+    """Generate polygon with OpenScad.
+
+    Polygon is a cylinder with very small number of fragments.
+
+    https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Primitive_Solids#cylinder
+    """
+
+    def generate_scad(self, data):
+        """Randomly generate the OpenScad description data.
+
+        Args:
+            data: The data dictionary.
+
+        Returns:
+            scad: The description data.
+        """
+        fn = np.random.randint(6, 20)
+        scad = ('cylinder(h={h:f}, d1={d1:f}, d2={d2:f}, $fn={fn:d}, '
+                'center=true);').format(h=data['size_z'],
+                                        d1=data['size_x'],
+                                        d2=data['size_y'],
+                                        fn=fn)
+
+        if np.random.rand() < ROUND_PROB:
+            scad1 = 'sphere(d={d:f}, $fn={fn:d});'.format(
+                    d=data['size_x'], fn=fn)
+            scad1 = 'translate([0, 0, -%f]) {{%s}} ' % (
+                    0.5 * data['size_z'], scad1)
+            scad = scad + ' ' + scad1
+
+        if np.random.rand() < ROUND_PROB:
+            scad2 = 'sphere(d={d:f}, $fn={fn:d});'.format(
+                    d=data['size_y'], fn=fn)
+            scad2 = 'translate([0, 0, %f]) {{%s}} ' % (
+                    0.5 * data['size_z'], scad2)
+            scad = scad + ' ' + scad2
 
         return scad
