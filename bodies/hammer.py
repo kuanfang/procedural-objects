@@ -14,6 +14,8 @@ from links.scad_link import ScadPolygonLink
 from utils.transformations import matrix3_from_euler
 
 
+FLIP_PROB = 0.5
+
 LATERAL_FRICTION_RANGE = [0.2, 1.0]
 SPINNING_FRICTION_RANGE = [0.2, 1.0]
 INERTIA_FRICTION_RANGE = [0.2, 1.0]
@@ -128,9 +130,25 @@ class Hammer(Body):
         head_data['pitch'] = rotation[1]
         head_data['yaw'] = rotation[2]
 
-        # TODO(kuanfang): Random flipping.
         if self.random_flip:
-            pass
+            if np.random.rand() >= FLIP_PROB:
+                handle_data['roll'] = (handle_data['roll'] + np.pi) % (
+                        2 * np.pi)
+
+            if np.random.rand() >= FLIP_PROB:
+                handle_data['pitch'] = (handle_data['pitch'] + np.pi) % (np.pi)
+
+            if np.random.rand() >= FLIP_PROB:
+                handle_data['yaw'] = (handle_data['yaw'] + np.pi) % (2 * np.pi)
+
+            if np.random.rand() >= FLIP_PROB:
+                head_data['roll'] = (head_data['roll'] + np.pi) % (2 * np.pi)
+
+            if np.random.rand() >= FLIP_PROB:
+                head_data['pitch'] = (head_data['pitch'] + np.pi) % (np.pi)
+
+            if np.random.rand() >= FLIP_PROB:
+                head_data['yaw'] = (head_data['yaw'] + np.pi) % (2 * np.pi)
 
         # Genearte the URDF files.
         handle_urdf = handle_generator.convert_data_to_urdf(handle_data)
