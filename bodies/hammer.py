@@ -54,8 +54,14 @@ def transform_point(point, rotation, translation):
 
 class Hammer(Body):
 
-    def __init__(self, obj_paths=None, random_flip=True, name='body'):
+    def __init__(self, name, obj_paths=None, random_flip=True):
         """Initialize.
+
+        Args:
+            name: The name of the body.
+            obj_paths: If None, use OpenScad to gnerate objects; otherwise
+                sample objects from obj_paths.
+            random_flip: If true, randomly flip the parts along the three axes.
         """
         with open('templates/hammer.xml', 'r') as f:
             self.template = f.read()

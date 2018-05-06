@@ -17,23 +17,31 @@ class ScadLink(Link):
 
     def __init__(self,
                  name,
+                 size_range,
                  mass_range,
                  lateral_friction_range,
                  spinning_friction_range,
                  inertia_friction_range,
-                 size_range,
                  ):
         """Initialize.
+
+        Args:
+            name: Name of the link.
+            size_range: The range of the shape size as a numpy array of [3, 2].
+            mass_range: The range of the mass of the link.
+            lateral_friction_range: The range of the lateral friction.
+            spinning_friction_range: The range of the spinning friction.
+            inertia_friction_range: The range of the inertia friction.
         """
         with open('templates/link.xml', 'r') as f:
             self.template = f.read()
 
         self.name = name
+        self.size_range = size_range
         self.mass_range = mass_range
         self.lateral_friction_range = lateral_friction_range
         self.spinning_friction_range = spinning_friction_range
         self.inertia_friction_range = inertia_friction_range
-        self.size_range = size_range
 
     def generate(self, path=None):
         """Generate a link.

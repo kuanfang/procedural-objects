@@ -69,7 +69,7 @@ def main():
     else:
         obj_paths = glob.glob(args.obj_paths)
 
-    body_generator = body_class(obj_paths=obj_paths)
+    body_generator = body_class(name='body', obj_paths=obj_paths)
 
     for body_id in range(args.num_bodies):
         output_path = os.path.join(args.output_dir, '%06d' % (body_id))

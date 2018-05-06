@@ -10,8 +10,13 @@ class Body(object):
 
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, obj_paths=None, name='body.urdf'):
-        """
+    def __init__(self, name, obj_paths=None):
+        """Initialize.
+
+        Args:
+            name: The name of the body URDF file.
+            obj_paths: If None, use OpenScad to gnerate objects; otherwise
+                sample objects from obj_paths.
         """
         pass
 
