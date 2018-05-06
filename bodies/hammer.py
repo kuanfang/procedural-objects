@@ -36,6 +36,11 @@ HEAD_CONFIG = {
         'inertia_friction_range': INERTIA_FRICTION_RANGE,
         }
 
+CMAP = {
+        'wood': [0.494, 0.278, 0.164],
+        'metal': [0.654, 0.698, 0.761],
+        }
+
 
 def transform_point(point, rotation, translation):
     """Rigid transformation of a point.
@@ -62,34 +67,52 @@ class Hammer(Body):
     A hammer is defined as a two-part object composed of a handle and a head.
     """
 
-    def __init__(self, name, obj_paths=None, random_flip=True):
+    def __init__(self, name, obj_paths=None, color=None, random_flip=True):
         """Initialize.
 
         Args:
             name: The name of the body.
             obj_paths: If None, use OpenScad to gnerate objects; otherwise
                 sample objects from obj_paths.
+            color: The color code.
             random_flip: If true, randomly flip the parts along the three axes.
         """
+        self.name = name
+        self.random_flip = random_flip
+
+        if color == 'realistic':
+            handle_color = CMAP['wood']
+            head_color = CMAP['metal']
+        else:
+            handle_color = None
+            head_color = None
+
         with open('templates/hammer.xml', 'r') as f:
             self.template = f.read()
 
         if obj_paths is None:
             self.handle_generators = [
-                    ScadCubeLink(name='handle', **HANDLE_CONFIG),
-                    ScadCylinderLink(name='handle', **HANDLE_CONFIG),
-                    ScadPolygonLink(name='handle', **HANDLE_CONFIG),
+                    ScadCubeLink(
+                        name='handle', color=handle_color, **HANDLE_CONFIG),
+                    ScadCylinderLink(
+                        name='handle', color=handle_color, **HANDLE_CONFIG),
+                    ScadPolygonLink(
+                        name='handle', color=handle_color, **HANDLE_CONFIG),
                     ]
 
             self.head_generators = [
-                    ScadCubeLink(name='head', **HEAD_CONFIG),
-                    ScadCylinderLink(name='head', **HEAD_CONFIG),
-                    ScadPolygonLink(name='head', **HEAD_CONFIG),
+                    ScadCubeLink(
+                        name='head', color=head_color, **HEAD_CONFIG),
+                    ScadCylinderLink(
+                        name='head', color=head_color, **HEAD_CONFIG),
+                    ScadPolygonLink(
+                        name='head', color=head_color, **HEAD_CONFIG),
                     ]
         else:
             self.handle_generators = [
                     Link(
                         name='handle',
+                        color=handle_color,
                         obj_paths=obj_paths,
                         **HANDLE_CONFIG)
                     ]
@@ -97,13 +120,10 @@ class Hammer(Body):
             self.head_generators = [
                     Link(
                         name='head',
+                        color=head_color,
                         obj_paths=obj_paths,
                         **HEAD_CONFIG)
                     ]
-
-        self.random_flip = random_flip
-
-        self.name = name
 
     def generate(self, path):
         """Generate a body.

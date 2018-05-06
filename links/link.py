@@ -19,6 +19,7 @@ class Link(object):
                  lateral_friction_range,
                  spinning_friction_range,
                  inertia_friction_range,
+                 color,
                  obj_paths,
                  ):
         """Initialize.
@@ -30,17 +31,19 @@ class Link(object):
             lateral_friction_range: The range of the lateral friction.
             spinning_friction_range: The range of the spinning friction.
             inertia_friction_range: The range of the inertia friction.
+            color: The color code or the (r, g, b) values.
             obj_paths: Paths from which the objects are sampled.
         """
         with open('templates/link.xml', 'r') as f:
             self.template = f.read()
 
         self.name = name
+        self.size_range = size_range
         self.mass_range = mass_range
         self.lateral_friction_range = lateral_friction_range
         self.spinning_friction_range = spinning_friction_range
         self.inertia_friction_range = inertia_friction_range
-        self.size_range = size_range
+        self.color = color
         self.obj_paths = obj_paths
 
     def generate(self, path=None):
@@ -83,6 +86,12 @@ class Link(object):
         data['scale_y'] = data['size_y']
         data['scale_z'] = data['size_z']
 
+        # Set color.
+        color = self.sample_color()
+        data['color_r'] = color[0]
+        data['color_g'] = color[1]
+        data['color_b'] = color[2]
+
         # Choose and copy mesh.
         obj_file = np.random.choice(self.obj_paths)
         data['filename'] = os.path.join(path, '%s.obj' % (self.name))
@@ -90,6 +99,19 @@ class Link(object):
         os.system(command)
 
         return data
+
+    def sample_color(self):
+        """Sample the color.
+
+        Returns:
+            Color as values of (r, g, b).
+        """
+        if self.color is None:
+            color = np.random.rand(3)
+        else:
+            color = self.color
+
+        return color
 
     def convert_data_to_urdf(self, data):
         """Get the urdf text of the link.

@@ -30,6 +30,12 @@ def parse_args():
                         default=None,
                         type=str)
 
+    parser.add_argument('--color',
+                        dest='color',
+                        help='Color code for the object.',
+                        default=None,
+                        type=str)
+
     parser.add_argument('--output',
                         dest='output_dir',
                         help='The output directory.',
@@ -69,7 +75,9 @@ def main():
     else:
         obj_paths = glob.glob(args.obj_paths)
 
-    body_generator = body_class(name='body', obj_paths=obj_paths)
+    body_generator = body_class(name='body',
+                                obj_paths=obj_paths,
+                                color=args.color)
 
     for body_id in range(args.num_bodies):
         output_path = os.path.join(args.output_dir, '%06d' % (body_id))

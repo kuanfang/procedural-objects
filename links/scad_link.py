@@ -25,6 +25,7 @@ class ScadLink(Link):
                  lateral_friction_range,
                  spinning_friction_range,
                  inertia_friction_range,
+                 color,
                  ):
         """Initialize.
 
@@ -35,6 +36,7 @@ class ScadLink(Link):
             lateral_friction_range: The range of the lateral friction.
             spinning_friction_range: The range of the spinning friction.
             inertia_friction_range: The range of the inertia friction.
+            color: The color code or the (r, g, b) values.
         """
         with open('templates/link.xml', 'r') as f:
             self.template = f.read()
@@ -45,6 +47,7 @@ class ScadLink(Link):
         self.lateral_friction_range = lateral_friction_range
         self.spinning_friction_range = spinning_friction_range
         self.inertia_friction_range = inertia_friction_range
+        self.color = color
 
     def generate(self, path=None):
         """Generate a link.
@@ -85,6 +88,12 @@ class ScadLink(Link):
         data['scale_x'] = 1
         data['scale_y'] = 1
         data['scale_z'] = 1
+
+        # Set color.
+        color = self.sample_color()
+        data['color_r'] = color[0]
+        data['color_g'] = color[1]
+        data['color_b'] = color[2]
 
         # Generate mesh use OpenScad.
         data['filename'] = self.run_openscad(path, data)
@@ -183,6 +192,7 @@ class ScadCylinderLink(ScadLink):
             scad: The description data.
         """
         fn = np.random.randint(20, 64)
+
         scad = ('cylinder(h={h:f}, d1={d1:f}, d2={d2:f}, $fn={fn:d}, '
                 'center=true);').format(h=data['size_z'],
                                         d1=data['size_x'],
@@ -224,6 +234,7 @@ class ScadPolygonLink(ScadLink):
             scad: The description data.
         """
         fn = np.random.randint(6, 20)
+
         scad = ('cylinder(h={h:f}, d1={d1:f}, d2={d2:f}, $fn={fn:d}, '
                 'center=true);').format(h=data['size_z'],
                                         d1=data['size_x'],

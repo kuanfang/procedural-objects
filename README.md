@@ -10,16 +10,16 @@
 2. Visualize a .urdf or .obj file:
 
     ```Shell
-    python visualize.py --input outputs/000000.obj
+    python visualize.py --input outputs/000000/body.urdf
     ```
     or
     ```Shell
-    python visualize.py --input outputs/*.urdf
+    python visualize.py --input outputs/000000/head.obj
     ```
 
 ### Generation
 1. Generate realistic objects:
 
     ```Shell
-    python generate_body.py --body hammer --mesh outputs/000000.obj --output outputs/ --num 1
+    python generate.py --body t --color realistic --mesh data/example/duck_vhacd.obj --output outputs/ --num 1
     ```
