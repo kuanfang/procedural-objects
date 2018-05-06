@@ -21,16 +21,16 @@ SPINNING_FRICTION_RANGE = [0.2, 1.0]
 INERTIA_FRICTION_RANGE = [0.2, 1.0]
 
 HANDLE_CONFIG = {
-        'mass_range': [0.5, 1.0],
-        'size_range': [[0.1, 0.1], [0.2, 0.2], [1, 1]],
+        'mass_range': [0.4, 1.2],
+        'size_range': [[0.02, 0.05], [0.02, 0.05], [0.12, 0.28]],
         'lateral_friction_range': LATERAL_FRICTION_RANGE,
         'spinning_friction_range': SPINNING_FRICTION_RANGE,
         'inertia_friction_range': INERTIA_FRICTION_RANGE,
         }
 
 HEAD_CONFIG = {
-        'mass_range': [0.5, 1.0],
-        'size_range': [[0.1, 0.1], [0.2, 0.2], [1, 1]],
+        'mass_range': [0.8, 1.6],
+        'size_range': [[0.03, 0.06], [0.03, 0.06], [0.10, 0.20]],
         'lateral_friction_range': LATERAL_FRICTION_RANGE,
         'spinning_friction_range': SPINNING_FRICTION_RANGE,
         'inertia_friction_range': INERTIA_FRICTION_RANGE,
@@ -180,5 +180,106 @@ class Hammer(Body):
         # The orthogonal T-Shape hammer.
         rotation = [0.5 * np.pi, 0, 0]
         translation = [0, 0, 0.5 * handle_data['size_z']]
+
+        return rotation, translation
+
+
+class TShape(Hammer):
+    """T-Sahpe generator.
+    """
+
+    def sample_head_transformation(self, handle_data, head_data):
+        """Sample the transformation for the head pose.
+
+        Args:
+            handle_data: The data dictionary of the handle.
+            head_data: The data dictionary of the head.
+
+        Returns:
+            rotation: The rotation as Euler angles.
+            translation: The translation vector.
+        """
+        # The orthogonal T-Shape hammer.
+        rotation = [
+                np.random.choice([-1, 1]) * np.random.uniform(
+                    0, 0.15 * np.pi) + 0.5 * np.pi,
+                np.random.choice([-1, 1]) * np.random.uniform(
+                    0, 0.15 * np.pi),
+                0,
+                ]
+
+        translation = [
+                0,
+                np.random.choice([-1, 1]) * np.random.uniform(
+                    0, 0.3 * head_data['size_z']),
+                0.5 * handle_data['size_z']
+                ]
+
+        return rotation, translation
+
+
+class LShape(Hammer):
+    """L-Sahpe generator.
+    """
+
+    def sample_head_transformation(self, handle_data, head_data):
+        """Sample the transformation for the head pose.
+
+        Args:
+            handle_data: The data dictionary of the handle.
+            head_data: The data dictionary of the head.
+
+        Returns:
+            rotation: The rotation as Euler angles.
+            translation: The translation vector.
+        """
+        # The orthogonal T-Shape hammer.
+        rotation = [
+                0.5 * np.pi + np.random.choice([-1, 1]) * np.random.uniform(
+                    0, 0.15 * np.pi),
+                np.random.choice([-1, 1]) * np.random.uniform(
+                    0, 0.15 * np.pi),
+                0,
+                ]
+
+        translation = [
+                0,
+                np.random.choice([-1, 1]) * np.random.uniform(
+                    0.3 * head_data['size_z'], 0.5 * head_data['size_z']),
+                0.5 * handle_data['size_z']
+                ]
+
+        return rotation, translation
+
+
+class XShape(Hammer):
+    """X-Sahpe generator.
+    """
+
+    def sample_head_transformation(self, handle_data, head_data):
+        """Sample the transformation for the head pose.
+
+        Args:
+            handle_data: The data dictionary of the handle.
+            head_data: The data dictionary of the head.
+
+        Returns:
+            rotation: The rotation as Euler angles.
+            translation: The translation vector.
+        """
+        # The orthogonal T-Shape hammer.
+        rotation = [
+                0.5 * np.pi + np.random.uniform(-0.15 * np.pi, 0.15 * np.pi),
+                np.random.uniform(-0.15 * np.pi, 0.15 * np.pi),
+                0,
+                ]
+
+        translation = [
+                0,
+                np.random.choice([-1, 1]) * np.random.uniform(
+                    0, 0.3 * head_data['size_z']),
+                np.random.choice([-1, 1]) * np.random.uniform(
+                    0, 0.3 * handle_data['size_z'])
+                ]
 
         return rotation, translation

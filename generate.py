@@ -57,10 +57,10 @@ def main():
         body_class = bodies.Hammer
     elif args.body_type == 't':
         body_class = bodies.TShape
-    # elif args.body_type == 'x':
-    #     body_class = bodies.TShape
-    # elif args.body_type == 'l':
-    #     body_class = bodies.LShape
+    elif args.body_type == 'l':
+        body_class = bodies.LShape
+    elif args.body_type == 'x':
+        body_class = bodies.XShape
     else:
         raise ValueError
 
