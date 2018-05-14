@@ -11,6 +11,7 @@ from links.link import Link
 from links.scad_link import ScadCubeLink
 from links.scad_link import ScadCylinderLink
 from links.scad_link import ScadPolygonLink
+from links.scad_link import ScadBreadLink
 from utils.transformations import matrix3_from_euler
 
 
@@ -21,15 +22,15 @@ SPINNING_FRICTION_RANGE = [0.2, 1.0]
 INERTIA_FRICTION_RANGE = [0.2, 1.0]
 
 HANDLE_CONFIG = {
-        'mass_range': [0.4, 1.2],
-        'size_range': [[0.02, 0.05], [0.02, 0.05], [0.12, 0.28]],
+        'mass_range': [0.4, 0.8],
+        'size_range': [[0.02, 0.05], [0.02, 0.05], [0.15, 0.30]],
         'lateral_friction_range': LATERAL_FRICTION_RANGE,
         'spinning_friction_range': SPINNING_FRICTION_RANGE,
         'inertia_friction_range': INERTIA_FRICTION_RANGE,
         }
 
 HEAD_CONFIG = {
-        'mass_range': [0.8, 1.6],
+        'mass_range': [0.8, 1.8],
         'size_range': [[0.03, 0.06], [0.03, 0.06], [0.10, 0.20]],
         'lateral_friction_range': LATERAL_FRICTION_RANGE,
         'spinning_friction_range': SPINNING_FRICTION_RANGE,
@@ -106,6 +107,8 @@ class Hammer(Body):
                     ScadCylinderLink(
                         name='head', color=head_color, **HEAD_CONFIG),
                     ScadPolygonLink(
+                        name='head', color=head_color, **HEAD_CONFIG),
+                    ScadBreadLink(
                         name='head', color=head_color, **HEAD_CONFIG),
                     ]
         else:

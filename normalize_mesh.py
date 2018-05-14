@@ -6,6 +6,7 @@
 import argparse
 import glob
 import os
+import time
 
 import numpy as np
 
@@ -70,11 +71,21 @@ def main():
 
     input_paths = glob.glob(args.input_pattern)
 
+    if not os.path.exists(args.output_dir):
+        print('Creating output directory %s...' % (args.output_dir))
+        os.makedirs(args.output_dir)
+
+    tic = time.time()
+
     for index, input_path in enumerate(input_paths):
         # basename = os.path.splitext(os.path.basename(input_path))[0]
         # output_path = os.path.join(args.output_dir, '%s.obj' % basename)
+        print('Processing file %s...' % (input_path))
         output_path = os.path.join(args.output_dir, '%06d.obj' % index)
         normalize_mesh(input_path, output_path)
+
+    toc = time.time()
+    print('Finished in %.2f sec.' % (toc - tic))
 
 
 if __name__ == '__main__':

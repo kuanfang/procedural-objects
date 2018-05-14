@@ -6,6 +6,7 @@
 import argparse
 import glob
 import os
+import time
 
 import bodies
 
@@ -79,6 +80,8 @@ def main():
                                 obj_paths=obj_paths,
                                 color=args.color)
 
+    tic = time.time()
+
     for body_id in range(args.num_bodies):
         output_path = os.path.join(args.output_dir, '%06d' % (body_id))
         if os.path.exists(output_path):
@@ -86,7 +89,12 @@ def main():
         else:
             os.makedirs(output_path)
 
+        print('Generating object (%d / %d) at %s...'
+              % (body_id, args.num_bodies, output_path))
         body_generator.generate(output_path)
+
+    toc = time.time()
+    print('Finished in %.2f sec.' % (toc - tic))
 
 
 if __name__ == '__main__':

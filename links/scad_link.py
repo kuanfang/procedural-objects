@@ -191,25 +191,25 @@ class ScadCylinderLink(ScadLink):
         Returns:
             scad: The description data.
         """
-        fn = np.random.randint(20, 64)
+        fn = np.random.randint(20, 30)
 
-        scad = ('cylinder(h={h:f}, d1={d1:f}, d2={d2:f}, $fn={fn:d}, '
+        scad = ('cylinder(h={h:f}, r1={r1:f}, r2={r2:f}, $fn={fn:d}, '
                 'center=true);').format(h=data['size_z'],
-                                        d1=data['size_x'],
-                                        d2=data['size_y'],
+                                        r1=0.5 * data['size_x'],
+                                        r2=0.5 * data['size_y'],
                                         fn=fn)
 
         if np.random.rand() < ROUND_PROB:
-            scad1 = 'sphere(d={d:f}, $fn={fn:d});'.format(
-                    d=data['size_x'], fn=fn)
-            scad1 = 'translate([0, 0, -%f]) {{%s}} ' % (
+            scad1 = 'sphere(r={r:f}, $fn={fn:d});'.format(
+                    r=0.5 * data['size_x'], fn=fn)
+            scad1 = 'translate([0, 0, -%f]) %s ' % (
                     0.5 * data['size_z'], scad1)
             scad = scad + ' ' + scad1
 
         if np.random.rand() < ROUND_PROB:
-            scad2 = 'sphere(d={d:f}, $fn={fn:d});'.format(
-                    d=data['size_y'], fn=fn)
-            scad2 = 'translate([0, 0, %f]) {{%s}} ' % (
+            scad2 = 'sphere(r={r:f}, $fn={fn:d});'.format(
+                    r=0.5 * data['size_y'], fn=fn)
+            scad2 = 'translate([0, 0, %f]) %s ' % (
                     0.5 * data['size_z'], scad2)
             scad = scad + ' ' + scad2
 
@@ -235,24 +235,57 @@ class ScadPolygonLink(ScadLink):
         """
         fn = np.random.randint(6, 20)
 
-        scad = ('cylinder(h={h:f}, d1={d1:f}, d2={d2:f}, $fn={fn:d}, '
+        scad = ('cylinder(h={h:f}, r1={r1:f}, r2={r2:f}, $fn={fn:d}, '
                 'center=true);').format(h=data['size_z'],
-                                        d1=data['size_x'],
-                                        d2=data['size_y'],
+                                        r1=0.5 * data['size_x'],
+                                        r2=0.5 * data['size_y'],
                                         fn=fn)
 
         if np.random.rand() < ROUND_PROB:
-            scad1 = 'sphere(d={d:f}, $fn={fn:d});'.format(
-                    d=data['size_x'], fn=fn)
-            scad1 = 'translate([0, 0, -%f]) {{%s}} ' % (
+            scad1 = 'sphere(r={r:f}, $fn={fn:d});'.format(
+                    r=0.5 * data['size_x'], fn=fn)
+            scad1 = 'translate([0, 0, -%f]) %s ' % (
                     0.5 * data['size_z'], scad1)
             scad = scad + ' ' + scad1
 
         if np.random.rand() < ROUND_PROB:
-            scad2 = 'sphere(d={d:f}, $fn={fn:d});'.format(
-                    d=data['size_y'], fn=fn)
-            scad2 = 'translate([0, 0, %f]) {{%s}} ' % (
+            scad2 = 'sphere(r={r:f}, $fn={fn:d});'.format(
+                    r=0.5 * data['size_y'], fn=fn)
+            scad2 = 'translate([0, 0, %f]) %s ' % (
                     0.5 * data['size_z'], scad2)
             scad = scad + ' ' + scad2
+
+        return scad
+
+
+class ScadBreadLink(ScadLink):
+    """Generate polygon with OpenScad.
+
+    Polygon is a cylinder with very small number of fragments.
+
+    https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Primitive_Solids#cylinder
+    """
+
+    def generate_scad(self, data):
+        """Randomly generate the OpenScad description data.
+
+        Args:
+            data: The data dictionary.
+
+        Returns:
+            scad: The description data.
+        """
+        fn = np.random.randint(6, 40)
+
+        scad1 = ('cylinder(h={h:f}, r={r:f}, $fn={fn:d}, '
+                 'center=true);').format(h=data['size_z'],
+                                         r=0.5 * data['size_y'],
+                                         fn=fn)
+
+        scad2 = 'cube([{x:f}, {y:f}, {z:f}], center=true);'.format(
+                x=data['size_x'], y=data['size_y'], z=data['size_z'])
+        scad2 = 'translate([0, %f, 0]) %s ' % (0.5 * data['size_y'], scad2)
+
+        scad = scad1 + ' ' + scad2
 
         return scad
