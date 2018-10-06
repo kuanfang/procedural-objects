@@ -1,5 +1,19 @@
 # Procedural Object Generation
 
+The procedural object generation used in [Learning Task-Oriented Grasping for Tool Manipulation from Simulated Self-Supervision](https://sites.google.com/view/task-oriented-grasp/).
+
+
+### Citation
+```
+@inproceedings{fang2018rss,
+author = {Kuan Fang, Yuke Zhu, Animesh Garg, Andrey Kuryenkov, Viraj Mehta, Li Fei-Fei, Silvio Savarese},
+title = {Learning Task-Oriented Grasping for Tool Manipulation from Simulated Self-Supervision},
+booktitle = {Robotics: Science and Systems (RSS)},
+month = {June},
+year = {2018}
+}
+```
+
 ### Prepare
 1. Normalize .obj mesh files:
 
